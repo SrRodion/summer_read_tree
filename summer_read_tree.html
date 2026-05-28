@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Летний трекер чтения — Дерево успеха</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eaf7e6;
+            font-family: 'Segoe UI', 'Roboto', 'Courier New', 'Apple Color Emoji', sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #2d3e2b;
+        }
+
+        /* контейнер для печати */
+        .tracker-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            background: #fffef7;
+            border-radius: 48px 48px 32px 32px;
+            box-shadow: 0 20px 35px rgba(0, 20, 0, 0.1);
+            padding: 24px 20px 32px 20px;
+            transition: all 0.2s;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin: 0 0 0.2rem 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            border-bottom: 3px dashed #9bc48f;
+            padding-bottom: 12px;
+        }
+
+        h1 span {
+            background: #fef5d4;
+            font-size: 1.3rem;
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-weight: normal;
+            color: #5a3e1b;
+        }
+
+        .sub {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+            background: #f9f2df;
+            padding: 10px 20px;
+            border-radius: 48px;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .legend span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .green-dot {
+            width: 20px;
+            height: 20px;
+            background-color: #6fbf4c;
+            border-radius: 6px;
+            display: inline-block;
+            border: 1px solid #3c7a2a;
+        }
+        .star-dot {
+            width: 20px;
+            height: 20px;
+            background-color: #f5b042;
+            border-radius: 6px;
+            display: inline-block;
+            text-align: center;
+            line-height: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #3c2a1f;
+            border: 1px solid #c97e1a;
+        }
+        .empty-dot {
+            width: 20px;
+            height: 20px;
+            background-color: #f2eee5;
+            border-radius: 6px;
+            display: inline-block;
+            border: 1px solid #bbb49b;
+        }
+
+        /* сетка месяцев (три колонки) */
+        .months-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: space-between;
+            margin: 20px 0 20px;
+        }
+
+        .month-card {
+            flex: 1;
+            min-width: 280px;
+            background: #fefcf5;
+            border-radius: 48px;
+            padding: 16px 12px 20px 12px;
+            box-shadow: 0 6px 14px rgba(80, 60, 20, 0.08);
+            border: 1px solid #e2dccd;
+        }
+
+        .month-name {
+            font-size: 1.9rem;
+            font-weight: 800;
+            text-align: center;
+            color: #3d6b2f;
+            margin: 0 0 15px 0;
+            letter-spacing: 2px;
+            background: #e7f0df;
+            display: inline-block;
+            width: 100%;
+            border-radius: 60px;
+            padding: 6px 0;
+        }
+
+        /* дерево-основа: ветки с неделями (ряды) */
+        .tree-branch {
+            margin-bottom: 28px;
+            border-left: 5px solid #aa8e66;
+            padding-left: 12px;
+        }
+
+        .week-label {
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: #7a5a3a;
+            background: #f2e5cf;
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 20px;
+            margin-bottom: 8px;
+        }
+
+        .leaf-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin: 8px 0 12px 0;
+        }
+
+        .day-leaf {
+            width: 42px;
+            height: 48px;
+            background: #fef4e0;
+            border-radius: 20px 8px 20px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: 0.1s linear;
+            border: 1px solid #dad0b2;
+            color: #4a3a22;
+        }
+
+        /* состояния для отметок (кликабельные) */
+        .day-leaf.read {
+            background: #6fbf4c;
+            border-color: #357a1e;
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .day-leaf.star {
+            background: #f5b042;
+            border-color: #c46f0a;
+            color: #2d2416;
+            font-weight: bold;
+        }
+        .day-leaf.empty {
+            background: #f2eee5;
+            color: #8a7a5f;
+        }
+
+        .day-number {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .day-icon {
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        /* подсказка по нажатию */
+        .tip {
+            text-align: center;
+            margin: 10px 0 0;
+            font-size: 12px;
+            color: #5c6e53;
+            background: #faf3e0;
+            border-radius: 28px;
+            padding: 5px;
+        }
+
+        /* итоговая строка-ствол */
+        .final-stump {
+            background: #dccfad;
+            border-radius: 60px;
+            padding: 18px 20px;
+            margin-top: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #2e3b21;
+        }
+
+        .final-stump input, .final-stump textarea {
+            background: #fff8ea;
+            border: 1px solid #bc9f6a;
+            border-radius: 30px;
+            padding: 8px 14px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            width: 180px;
+        }
+
+        .final-stump textarea {
+            width: 220px;
+            resize: vertical;
+        }
+
+        button {
+            background: #5f8b4a;
+            border: none;
+            border-radius: 40px;
+            padding: 8px 20px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.1s;
+            font-size: 0.8rem;
+        }
+
+        button:hover {
+            background: #3f672c;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            .tracker-container {
+                box-shadow: none;
+                padding: 10px;
+                max-width: 100%;
+            }
+            .day-leaf {
+                cursor: default;
+                break-inside: avoid;
+            }
+            button, .tip, .reset-print {
+                display: none;
+            }
+            .final-stump input, .final-stump textarea {
+                border: 1px solid #000;
+                background: #f9f9f0;
+            }
+            .month-card {
+                break-inside: avoid;
+            }
+        }
+
+        footer {
+            text-align: center;
+            font-size: 11px;
+            margin-top: 16px;
+            color: #7c8d6e;
+        }
+        .reset-print {
+            display: inline-block;
+            margin-left: 16px;
+        }
+    </style>
+</head>
+<body>
+<div class="tracker-container">
+    <h1>🌳 ДЕРЕВО ЛЕТНЕГО ЧТЕНИЯ <span>30 минут в день</span></h1>
+    <div class="sub">
+        <div class="legend">
+            <span><i class="empty-dot"></i> Не читал(а)</span>
+            <span><i class="green-dot"></i> ✅ Прочитал 30 мин</span>
+            <span><i class="star-dot"></i> ⭐ Прочитал + пересказ</span>
+        </div>
+        <div>🍃 Как пользоваться: нажми на листик, чтобы сменить статус: пусто → зелёный → звезда → пусто</div>
+    </div>
+
+    <div class="months-grid" id="monthsGrid">
+        <!-- динамическое заполнение через JS, но для надёжности сделаем структуру через генератор -->
+    </div>
+
+    <div class="final-stump">
+        <div>📊 ИТОГ: <span id="totalReadCount">0</span> дней с чтением</div>
+        <div>⭐ Самая сложная книга: <input type="text" id="hardBook" placeholder="Напиши здесь"></div>
+        <div>❤️ Самая любимая книга: <input type="text" id="favoriteBook" placeholder="Напиши здесь"></div>
+        <div>🎓 Оценка за лето: <input type="text" id="selfGrade" placeholder="5 / 4 / 3..."></div>
+        <button id="resetAllBtn">🌱 Сбросить все листья</button>
+    </div>
+    <div class="tip">
+        💡 Кликни по любому листику — он позеленеет (прочитано), ещё клик — станет золотой звездой (пересказ), третий клик — очистится.
+        Листья — это дни недели (пн-вс). Дерево растёт вместе с твоим чтением!
+    </div>
+    <footer>
+        🌿 Распечатай или сохрани PDF: каждый день отмечай прогресс. В конце лета заполни итоги у корней.
+    </footer>
+</div>
+
+<script>
+    // ---------- ДАННЫЕ по месяцам и неделям (4 полные недели + 5я "доделочная" для августа, но главное 4 видимых)
+    // Месяцы: Июнь, Июль, Август. Для каждого 4 недели (пн-вс). Номера дней подписаны "1-7" но для простоты обозначим пн-вс цифрами.
+    // Будем хранить состояние в localStorage. Ключ 'summerTreeTrackerV2'
+    // Структура: { "Июнь": { week0: [0,0,0,0,0,0,0], week1:..., week2..., week3... }, "Июль": ..., "Август": ... }
+    // 0 - пусто, 1 - прочитано (зеленый), 2 - звезда (пересказ)
+    
+    const months = ["Июнь", "Июль", "Август"];
+    // для каждого месяца 4 недели, каждая неделя 7 дней
+    const defaultData = {};
+    for (let m of months) {
+        defaultData[m] = {};
+        for (let w = 0; w < 4; w++) {
+            defaultData[m][`week${w}`] = [0,0,0,0,0,0,0];
+        }
+    }
+    
+    // загрузка / инициализация
+    let trackerData = JSON.parse(localStorage.getItem('summerTreeTrackerV2'));
+    if (!trackerData) {
+        trackerData = JSON.parse(JSON.stringify(defaultData));
+    }
+    
+    // функция сохранения
+    function saveData() {
+        localStorage.setItem('summerTreeTrackerV2', JSON.stringify(trackerData));
+        updateTotalCount();    // обновить отображение итогов
+    }
+    
+    // подсчитать общее кол-во дней где статус >0 (прочитано или звезда)
+    function computeTotalReadDays() {
+        let total = 0;
+        for (let month of months) {
+            const monthObj = trackerData[month];
+            if (!monthObj) continue;
+            for (let w = 0; w < 4; w++) {
+                const weekArr = monthObj[`week${w}`];
+                if (weekArr) {
+                    total += weekArr.filter(v => v > 0).length;
+                }
+            }
+        }
+        return total;
+    }
+    
+    function updateTotalCount() {
+        const total = computeTotalReadDays();
+        const spanTotal = document.getElementById('totalReadCount');
+        if (spanTotal) spanTotal.innerText = total;
+    }
+    
+    // функция отрисовки дерева для одного месяца
+    function renderMonth(monthName, containerId) {
+        const monthData = trackerData[monthName];
+        if (!monthData) return;
+        
+        const monthDiv = document.createElement('div');
+        monthDiv.className = 'month-card';
+        monthDiv.innerHTML = `<div class="month-name">🌳 ${monthName}</div>`;
+        
+        // 4 ветки (недели)
+        for (let w = 0; w < 4; w++) {
+            const weekKey = `week${w}`;
+            let weekArray = monthData[weekKey];
+            if (!weekArray) {
+                weekArray = [0,0,0,0,0,0,0];
+                monthData[weekKey] = weekArray;
+            }
+            const branchDiv = document.createElement('div');
+            branchDiv.className = 'tree-branch';
+            const weekNumber = w+1;
+            branchDiv.innerHTML = `<div class="week-label">🍂 ${weekNumber}-я неделя</div>`;
+            
+            const leafRow = document.createElement('div');
+            leafRow.className = 'leaf-row';
+            
+            // дни недели: пн(1) ... вс(7)
+            const dayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+            for (let d = 0; d < 7; d++) {
+                const status = weekArray[d]; // 0,1,2
+                const leaf = document.createElement('div');
+                leaf.className = `day-leaf ${status === 1 ? 'read' : (status === 2 ? 'star' : 'empty')}`;
+                // внутренность
+                const dayNum = document.createElement('div');
+                dayNum.className = 'day-number';
+                dayNum.innerText = dayNames[d];
+                const iconSpan = document.createElement('div');
+                iconSpan.className = 'day-icon';
+                if (status === 1) iconSpan.innerHTML = '✅';
+                else if (status === 2) iconSpan.innerHTML = '⭐';
+                else iconSpan.innerHTML = '🌱';
+                leaf.appendChild(dayNum);
+                leaf.appendChild(iconSpan);
+                
+                // клик переключение 0->1->2->0
+                leaf.addEventListener('click', (function(month, weekIdx, dayIdx) {
+                    return function() {
+                        const current = trackerData[month][`week${weekIdx}`][dayIdx];
+                        let newVal;
+                        if (current === 0) newVal = 1;
+                        else if (current === 1) newVal = 2;
+                        else newVal = 0;
+                        trackerData[month][`week${weekIdx}`][dayIdx] = newVal;
+                        saveData();
+                        // перерисуем весь месяц (легко и надежно)
+                        rerenderAll();
+                    };
+                })(monthName, w, d));
+                
+                leafRow.appendChild(leaf);
+            }
+            branchDiv.appendChild(leafRow);
+            monthDiv.appendChild(branchDiv);
+        }
+        // добавим небольшой "пенек" месяца для настроения
+        const miniFruit = document.createElement('div');
+        miniFruit.style.textAlign = 'center';
+        miniFruit.style.fontSize = '0.75rem';
+        miniFruit.style.marginTop = '8px';
+        miniFruit.style.color = '#7e6a42';
+        miniFruit.innerHTML = '🍎🍏';
+        monthDiv.appendChild(miniFruit);
+        
+        document.getElementById(containerId).appendChild(monthDiv);
+    }
+    
+    function rerenderAll() {
+        const grid = document.getElementById('monthsGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        for (let m of months) {
+            renderMonth(m, 'monthsGrid');
+        }
+        updateTotalCount();
+        // также подгрузим значения полей из localStorage, чтобы не сбросить введенный текст при клике
+        restoreInputsFromLocal();
+    }
+    
+    // сохранять в localstorage также текстовые поля (самая сложная книга и тд) - для удобства при печати/перезагрузке
+    function saveInputsToLocal() {
+        const hard = document.getElementById('hardBook')?.value || '';
+        const fav = document.getElementById('favoriteBook')?.value || '';
+        const grade = document.getElementById('selfGrade')?.value || '';
+        localStorage.setItem('summerBookMeta', JSON.stringify({ hard, fav, grade }));
+    }
+    
+    function restoreInputsFromLocal() {
+        const meta = localStorage.getItem('summerBookMeta');
+        if (meta) {
+            try {
+                const { hard, fav, grade } = JSON.parse(meta);
+                if (document.getElementById('hardBook')) document.getElementById('hardBook').value = hard || '';
+                if (document.getElementById('favoriteBook')) document.getElementById('favoriteBook').value = fav || '';
+                if (document.getElementById('selfGrade')) document.getElementById('selfGrade').value = grade || '';
+            } catch(e) {}
+        }
+    }
+    
+    // сброс всех листьев
+    function resetAllLeaves() {
+        if (confirm('🌿 Сбросить все отметки чтения? Все листья станут пустыми. Итоговые записи книг останутся.')) {
+            for (let m of months) {
+                for (let w = 0; w < 4; w++) {
+                    trackerData[m][`week${w}`] = [0,0,0,0,0,0,0];
+                }
+            }
+            saveData();
+            rerenderAll();
+        }
+    }
+    
+    // добавляем событие сохранения полей при вводе
+    function bindInputsSave() {
+        const hardInput = document.getElementById('hardBook');
+        const favInput = document.getElementById('favoriteBook');
+        const gradeInput = document.getElementById('selfGrade');
+        if (hardInput) hardInput.addEventListener('input', () => saveInputsToLocal());
+        if (favInput) favInput.addEventListener('input', () => saveInputsToLocal());
+        if (gradeInput) gradeInput.addEventListener('input', () => saveInputsToLocal());
+    }
+    
+    // дополнительный метод для печати подсказок, в том числе чтобы при печати были видны отметки
+    // а также добавим описание книжек-рекомендаций на полях в виде маленького напоминания? Визуально сделаем дополнительный блок с основными произведениями по неделям.
+    // Чтобы трекер был полезен, добавим внизу каждого месяца мини-памятку (что читать ориентировочно)
+    function addReadingHints() {
+        const hints = {
+            "Июнь": ["1 нед: Левша🔴, Чехов, Манюня", "2 нед: Уроки французского🔴, Дубровский, Время всегда хорошее", "3 нед: Гомер(циклоп), Бежин луг, Лермонтов, Ходячий замок", "4 нед: Детство, Былины, Чехов, стихи Пушкина"],
+            "Июль": ["5 нед: Робинзон Крузо, Чучело🔴, Дневник Берта", "6 нед: Гулливер, Дети капитана Гранта, Гай-до", "7 нед: Тень каравеллы, Манюня, Дневник Берта", "8 нед: Чернильное сердце, Зерцалия, стихи"],
+            "Август": ["9 нед: доделать Левшу/Уроки франц., Бежин луг", "10 нед: Ходячий замок, Манюня, Чехов", "11 нед: повтор Пушкин, Лермонтов, Гомер", "12 нед: свободное чтение / отдых"]
+        };
+        const monthCards = document.querySelectorAll('.month-card');
+        if (monthCards.length === 3) {
+            monthCards.forEach((card, idx) => {
+                let monthName = months[idx];
+                let hintList = hints[monthName];
+                if (hintList) {
+                    const hintBox = document.createElement('div');
+                    hintBox.style.fontSize = '0.7rem';
+                    hintBox.style.backgroundColor = '#f7f0e0';
+                    hintBox.style.borderRadius = '28px';
+                    hintBox.style.padding = '8px 10px';
+                    hintBox.style.marginTop = '14px';
+                    hintBox.style.border = '1px solid #e2cf9e';
+                    hintBox.style.color = '#5b4a2c';
+                    hintBox.innerHTML = `<strong>📖 подсказка:</strong><br> ${hintList.join(' • ')}`;
+                    card.appendChild(hintBox);
+                }
+            });
+        }
+    }
+    
+    // функция для отслеживания мутаций после отрисовки (чтобы добавить хинты)
+    function observeAndAddHints() {
+        const observer = new MutationObserver(() => {
+            if (document.querySelectorAll('.month-card').length === 3 && !document.querySelector('.hint-added')) {
+                addReadingHints();
+                const hintsDiv = document.querySelectorAll('.month-card .hint-added'); // метка не нужна
+                document.querySelectorAll('.month-card').forEach(c => c.classList.add('hint-added'));
+                observer.disconnect();
+            }
+        });
+        observer.observe(document.getElementById('monthsGrid'), { childList: true, subtree: false });
+        setTimeout(() => {
+            if (document.querySelectorAll('.month-card').length === 3) addReadingHints();
+        }, 50);
+    }
+    
+    // первичная инициализация
+    function init() {
+        rerenderAll();
+        bindInputsSave();
+        const resetBtn = document.getElementById('resetAllBtn');
+        if (resetBtn) resetBtn.addEventListener('click', resetAllLeaves);
+        restoreInputsFromLocal();
+        // добавим хинты после небольшой задержки
+        setTimeout(() => {
+            addReadingHints();
+        }, 100);
+        observeAndAddHints();
+        // добавим дополнительный слушатель сохранения полей при уходе со страницы
+        window.addEventListener('beforeunload', () => {
+            saveInputsToLocal();
+        });
+    }
+    
+    init();
+</script>
+</body>
+</html>
