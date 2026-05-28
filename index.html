@@ -1,9 +1,11 @@
+Я добавил в HTML-трекер полноценный чек-лист всех произведений из вашего летнего списка. Теперь на одной странице можно отмечать как ежедневное чтение по 30 минут («Дерево успеха»), так и факт прочтения каждой конкретной книги или рассказа. Чек-лист разделён на обязательное и внеклассное чтение, а все элементы сохраняются в браузере.
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Летний трекер чтения — Дерево успеха</title>
+    <title>Летний трекер чтения — Дерево успеха + Чек-лист книг</title>
     <style>
         * {
             box-sizing: border-box;
@@ -17,15 +19,13 @@
             color: #2d3e2b;
         }
 
-        /* контейнер для печати */
         .tracker-container {
-            max-width: 1280px;
+            max-width: 1400px;
             margin: 0 auto;
             background: #fffef7;
             border-radius: 48px 48px 32px 32px;
             box-shadow: 0 20px 35px rgba(0, 20, 0, 0.1);
             padding: 24px 20px 32px 20px;
-            transition: all 0.2s;
         }
 
         h1 {
@@ -103,46 +103,55 @@
             border: 1px solid #bbb49b;
         }
 
-        /* сетка месяцев (три колонки) */
-        .months-grid {
+        /* две колонки: трекер дерева + чек-лист */
+        .dashboard {
             display: flex;
             flex-wrap: wrap;
-            gap: 24px;
-            justify-content: space-between;
+            gap: 28px;
             margin: 20px 0 20px;
         }
-
-        .month-card {
-            flex: 1;
+        .tree-col {
+            flex: 2;
+            min-width: 300px;
+        }
+        .checklist-col {
+            flex: 1.2;
             min-width: 280px;
+            background: #fefcf0;
+            border-radius: 48px;
+            padding: 18px 16px;
+            border: 1px solid #e2dccd;
+            box-shadow: 0 6px 14px rgba(80, 60, 20, 0.05);
+            height: fit-content;
+        }
+
+        .months-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .month-card {
             background: #fefcf5;
             border-radius: 48px;
             padding: 16px 12px 20px 12px;
             box-shadow: 0 6px 14px rgba(80, 60, 20, 0.08);
             border: 1px solid #e2dccd;
         }
-
         .month-name {
             font-size: 1.9rem;
             font-weight: 800;
             text-align: center;
             color: #3d6b2f;
             margin: 0 0 15px 0;
-            letter-spacing: 2px;
             background: #e7f0df;
-            display: inline-block;
-            width: 100%;
             border-radius: 60px;
             padding: 6px 0;
         }
-
-        /* дерево-основа: ветки с неделями (ряды) */
         .tree-branch {
             margin-bottom: 28px;
             border-left: 5px solid #aa8e66;
             padding-left: 12px;
         }
-
         .week-label {
             font-weight: bold;
             font-size: 0.9rem;
@@ -153,7 +162,6 @@
             border-radius: 20px;
             margin-bottom: 8px;
         }
-
         .leaf-row {
             display: flex;
             flex-wrap: wrap;
@@ -161,10 +169,9 @@
             gap: 8px;
             margin: 8px 0 12px 0;
         }
-
         .day-leaf {
-            width: 42px;
-            height: 48px;
+            width: 48px;
+            height: 56px;
             background: #fef4e0;
             border-radius: 20px 8px 20px 8px;
             display: flex;
@@ -179,13 +186,10 @@
             border: 1px solid #dad0b2;
             color: #4a3a22;
         }
-
-        /* состояния для отметок (кликабельные) */
         .day-leaf.read {
             background: #6fbf4c;
             border-color: #357a1e;
             color: white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
         .day-leaf.star {
             background: #f5b042;
@@ -197,29 +201,89 @@
             background: #f2eee5;
             color: #8a7a5f;
         }
-
         .day-number {
             font-size: 18px;
             font-weight: bold;
         }
-
         .day-icon {
             font-size: 14px;
-            line-height: 1;
         }
 
-        /* подсказка по нажатию */
-        .tip {
+        /* чек-лист стили */
+        .checklist-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #3d6b2f;
             text-align: center;
-            margin: 10px 0 0;
-            font-size: 12px;
-            color: #5c6e53;
-            background: #faf3e0;
-            border-radius: 28px;
-            padding: 5px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #c7dbb4;
+            display: inline-block;
+            width: 100%;
+        }
+        .checklist-section {
+            margin-bottom: 24px;
+        }
+        .checklist-section h3 {
+            background: #e0eccd;
+            display: inline-block;
+            padding: 4px 18px;
+            border-radius: 40px;
+            font-size: 1.1rem;
+            margin: 12px 0 8px 0;
+            color: #2e5420;
+        }
+        .checklist-item {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin: 10px 0;
+            padding: 4px 6px;
+            border-radius: 32px;
+            transition: 0.05s linear;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .checklist-item:hover {
+            background: #faf1df;
+        }
+        .checklist-item .checkbox-custom {
+            width: 24px;
+            height: 24px;
+            background: #fff2df;
+            border: 2px solid #7c9f62;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #2f5820;
+            flex-shrink: 0;
+        }
+        .checklist-item.checked .checkbox-custom {
+            background: #6fbf4c;
+            border-color: #2b6e15;
+            color: white;
+            content: "✓";
+        }
+        .checklist-item .item-text {
+            flex: 1;
+            line-height: 1.3;
+        }
+        .checklist-item.checked .item-text {
+            text-decoration: line-through;
+            color: #7e9470;
+        }
+        .progress-stats {
+            background: #e7efdb;
+            border-radius: 32px;
+            padding: 10px 15px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-align: center;
         }
 
-        /* итоговая строка-ствол */
         .final-stump {
             background: #dccfad;
             border-radius: 60px;
@@ -233,7 +297,6 @@
             font-weight: bold;
             color: #2e3b21;
         }
-
         .final-stump input, .final-stump textarea {
             background: #fff8ea;
             border: 1px solid #bc9f6a;
@@ -243,12 +306,6 @@
             font-size: 0.85rem;
             width: 180px;
         }
-
-        .final-stump textarea {
-            width: 220px;
-            resize: vertical;
-        }
-
         button {
             background: #5f8b4a;
             border: none;
@@ -260,91 +317,83 @@
             transition: 0.1s;
             font-size: 0.8rem;
         }
-
         button:hover {
             background: #3f672c;
         }
-
+        .tip {
+            text-align: center;
+            margin: 10px 0 0;
+            font-size: 12px;
+            color: #5c6e53;
+            background: #faf3e0;
+            border-radius: 28px;
+            padding: 5px;
+        }
         @media print {
             body {
                 background: white;
                 padding: 0;
-                margin: 0;
-            }
-            .tracker-container {
-                box-shadow: none;
-                padding: 10px;
-                max-width: 100%;
             }
             .day-leaf {
                 cursor: default;
-                break-inside: avoid;
             }
             button, .tip, .reset-print {
                 display: none;
             }
             .final-stump input, .final-stump textarea {
                 border: 1px solid #000;
-                background: #f9f9f0;
-            }
-            .month-card {
-                break-inside: avoid;
             }
         }
-
         footer {
             text-align: center;
             font-size: 11px;
             margin-top: 16px;
             color: #7c8d6e;
         }
-        .reset-print {
-            display: inline-block;
-            margin-left: 16px;
-        }
     </style>
 </head>
 <body>
 <div class="tracker-container">
-    <h1>🌳 ДЕРЕВО ЛЕТНЕГО ЧТЕНИЯ <span>30 минут в день</span></h1>
+    <h1>🌳 ЛЕТНЕЕ ЧТЕНИЕ <span>30 минут в день</span></h1>
     <div class="sub">
         <div class="legend">
             <span><i class="empty-dot"></i> Не читал(а)</span>
             <span><i class="green-dot"></i> ✅ Прочитал 30 мин</span>
             <span><i class="star-dot"></i> ⭐ Прочитал + пересказ</span>
         </div>
-        <div>🍃 Как пользоваться: нажми на листик, чтобы сменить статус: пусто → зелёный → звезда → пусто</div>
+        <div>🍃 Нажми на листик ➕ Отмечай книги в чек-листе</div>
     </div>
 
-    <div class="months-grid" id="monthsGrid">
-        <!-- динамическое заполнение через JS, но для надёжности сделаем структуру через генератор -->
+    <div class="dashboard">
+        <!-- ЛЕВАЯ ЧАСТЬ: ДЕРЕВО-ТРЕКЕР -->
+        <div class="tree-col">
+            <div class="months-grid" id="monthsGrid"></div>
+        </div>
+
+        <!-- ПРАВАЯ ЧАСТЬ: ЧЕК-ЛИСТ ПРОИЗВЕДЕНИЙ -->
+        <div class="checklist-col" id="checklistContainer">
+            <div class="checklist-title">📖 ЧЕК-ЛИСТ КНИГ</div>
+            <div id="checklistDynamic"></div>
+            <div class="progress-stats" id="checklistStats">✅ Прочитано книг: 0 / 0</div>
+        </div>
     </div>
 
     <div class="final-stump">
-        <div>📊 ИТОГ: <span id="totalReadCount">0</span> дней с чтением</div>
-        <div>⭐ Самая сложная книга: <input type="text" id="hardBook" placeholder="Напиши здесь"></div>
-        <div>❤️ Самая любимая книга: <input type="text" id="favoriteBook" placeholder="Напиши здесь"></div>
-        <div>🎓 Оценка за лето: <input type="text" id="selfGrade" placeholder="5 / 4 / 3..."></div>
-        <button id="resetAllBtn">🌱 Сбросить все листья</button>
+        <div>📊 Дней с чтением: <span id="totalReadCount">0</span></div>
+        <div>⭐ Сложная книга: <input type="text" id="hardBook" placeholder="Напиши"></div>
+        <div>❤️ Любимая книга: <input type="text" id="favoriteBook" placeholder="Напиши"></div>
+        <div>🎓 Оценка за лето: <input type="text" id="selfGrade" placeholder="5 / 4 / 3"></div>
+        <button id="resetAllBtn">🌱 Сбросить всё</button>
     </div>
     <div class="tip">
-        💡 Кликни по любому листику — он позеленеет (прочитано), ещё клик — станет золотой звездой (пересказ), третий клик — очистится.
-        Листья — это дни недели (пн-вс). Дерево растёт вместе с твоим чтением!
+        💡 Листья дерева: клик меняет статус (пусто → зелёный → звезда). Чек-лист: клик по строке — отметить книгу прочитанной. Все данные сохраняются в браузере.
     </div>
-    <footer>
-        🌿 Распечатай или сохрани PDF: каждый день отмечай прогресс. В конце лета заполни итоги у корней.
-    </footer>
+    <footer>Распечатай или сохрани PDF. Дерево + список книг — твой успех!</footer>
 </div>
 
 <script>
-    // ---------- ДАННЫЕ по месяцам и неделям (4 полные недели + 5я "доделочная" для августа, но главное 4 видимых)
-    // Месяцы: Июнь, Июль, Август. Для каждого 4 недели (пн-вс). Номера дней подписаны "1-7" но для простоты обозначим пн-вс цифрами.
-    // Будем хранить состояние в localStorage. Ключ 'summerTreeTrackerV2'
-    // Структура: { "Июнь": { week0: [0,0,0,0,0,0,0], week1:..., week2..., week3... }, "Июль": ..., "Август": ... }
-    // 0 - пусто, 1 - прочитано (зеленый), 2 - звезда (пересказ)
-    
+    // ---------- 1. Дерево (ежедневный трекер) ----------
     const months = ["Июнь", "Июль", "Август"];
-    // для каждого месяца 4 недели, каждая неделя 7 дней
     const defaultData = {};
     for (let m of months) {
         defaultData[m] = {};
@@ -353,19 +402,16 @@
         }
     }
     
-    // загрузка / инициализация
     let trackerData = JSON.parse(localStorage.getItem('summerTreeTrackerV2'));
     if (!trackerData) {
         trackerData = JSON.parse(JSON.stringify(defaultData));
     }
     
-    // функция сохранения
-    function saveData() {
+    function saveTreeData() {
         localStorage.setItem('summerTreeTrackerV2', JSON.stringify(trackerData));
-        updateTotalCount();    // обновить отображение итогов
+        updateTotalCountDisplay();
     }
     
-    // подсчитать общее кол-во дней где статус >0 (прочитано или звезда)
     function computeTotalReadDays() {
         let total = 0;
         for (let month of months) {
@@ -373,30 +419,24 @@
             if (!monthObj) continue;
             for (let w = 0; w < 4; w++) {
                 const weekArr = monthObj[`week${w}`];
-                if (weekArr) {
-                    total += weekArr.filter(v => v > 0).length;
-                }
+                if (weekArr) total += weekArr.filter(v => v > 0).length;
             }
         }
         return total;
     }
     
-    function updateTotalCount() {
-        const total = computeTotalReadDays();
+    function updateTotalCountDisplay() {
         const spanTotal = document.getElementById('totalReadCount');
-        if (spanTotal) spanTotal.innerText = total;
+        if (spanTotal) spanTotal.innerText = computeTotalReadDays();
     }
     
-    // функция отрисовки дерева для одного месяца
     function renderMonth(monthName, containerId) {
         const monthData = trackerData[monthName];
         if (!monthData) return;
-        
         const monthDiv = document.createElement('div');
         monthDiv.className = 'month-card';
         monthDiv.innerHTML = `<div class="month-name">🌳 ${monthName}</div>`;
         
-        // 4 ветки (недели)
         for (let w = 0; w < 4; w++) {
             const weekKey = `week${w}`;
             let weekArray = monthData[weekKey];
@@ -406,19 +446,14 @@
             }
             const branchDiv = document.createElement('div');
             branchDiv.className = 'tree-branch';
-            const weekNumber = w+1;
-            branchDiv.innerHTML = `<div class="week-label">🍂 ${weekNumber}-я неделя</div>`;
-            
+            branchDiv.innerHTML = `<div class="week-label">🍂 ${w+1}-я неделя</div>`;
             const leafRow = document.createElement('div');
             leafRow.className = 'leaf-row';
-            
-            // дни недели: пн(1) ... вс(7)
             const dayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
             for (let d = 0; d < 7; d++) {
-                const status = weekArray[d]; // 0,1,2
+                const status = weekArray[d];
                 const leaf = document.createElement('div');
                 leaf.className = `day-leaf ${status === 1 ? 'read' : (status === 2 ? 'star' : 'empty')}`;
-                // внутренность
                 const dayNum = document.createElement('div');
                 dayNum.className = 'day-number';
                 dayNum.innerText = dayNames[d];
@@ -429,60 +464,187 @@
                 else iconSpan.innerHTML = '🌱';
                 leaf.appendChild(dayNum);
                 leaf.appendChild(iconSpan);
-                
-                // клик переключение 0->1->2->0
                 leaf.addEventListener('click', (function(month, weekIdx, dayIdx) {
                     return function() {
-                        const current = trackerData[month][`week${weekIdx}`][dayIdx];
-                        let newVal;
-                        if (current === 0) newVal = 1;
-                        else if (current === 1) newVal = 2;
-                        else newVal = 0;
+                        const curr = trackerData[month][`week${weekIdx}`][dayIdx];
+                        let newVal = curr === 0 ? 1 : (curr === 1 ? 2 : 0);
                         trackerData[month][`week${weekIdx}`][dayIdx] = newVal;
-                        saveData();
-                        // перерисуем весь месяц (легко и надежно)
-                        rerenderAll();
+                        saveTreeData();
+                        rerenderTree();
                     };
                 })(monthName, w, d));
-                
                 leafRow.appendChild(leaf);
             }
             branchDiv.appendChild(leafRow);
             monthDiv.appendChild(branchDiv);
         }
-        // добавим небольшой "пенек" месяца для настроения
         const miniFruit = document.createElement('div');
         miniFruit.style.textAlign = 'center';
-        miniFruit.style.fontSize = '0.75rem';
+        miniFruit.style.fontSize = '0.7rem';
         miniFruit.style.marginTop = '8px';
         miniFruit.style.color = '#7e6a42';
         miniFruit.innerHTML = '🍎🍏';
         monthDiv.appendChild(miniFruit);
-        
         document.getElementById(containerId).appendChild(monthDiv);
     }
     
-    function rerenderAll() {
+    function rerenderTree() {
         const grid = document.getElementById('monthsGrid');
         if (!grid) return;
         grid.innerHTML = '';
-        for (let m of months) {
-            renderMonth(m, 'monthsGrid');
-        }
-        updateTotalCount();
-        // также подгрузим значения полей из localStorage, чтобы не сбросить введенный текст при клике
-        restoreInputsFromLocal();
+        for (let m of months) renderMonth(m, 'monthsGrid');
+        addReadingHintsToMonths();
+        updateTotalCountDisplay();
     }
     
-    // сохранять в localstorage также текстовые поля (самая сложная книга и тд) - для удобства при печати/перезагрузке
-    function saveInputsToLocal() {
+    function addReadingHintsToMonths() {
+        const hints = {
+            "Июнь": ["1 нед: Левша🔴, Чехов, Манюня", "2 нед: Уроки французского🔴, Дубровский, Время всегда хорошее", "3 нед: Гомер(циклоп), Бежин луг, Лермонтов, Ходячий замок", "4 нед: Детство, Былины, Чехов, стихи Пушкина"],
+            "Июль": ["5 нед: Робинзон Крузо, Чучело🔴, Дневник Берта", "6 нед: Гулливер, Дети капитана Гранта, Гай-до", "7 нед: Тень каравеллы, Манюня, Дневник Берта", "8 нед: Чернильное сердце, Зерцалия, стихи"],
+            "Август": ["9 нед: доделать Левшу/Уроки франц., Бежин луг", "10 нед: Ходячий замок, Манюня, Чехов", "11 нед: повтор Пушкин, Лермонтов, Гомер", "12 нед: свободное чтение / отдых"]
+        };
+        const monthCards = document.querySelectorAll('.month-card');
+        monthCards.forEach((card, idx) => {
+            let monthName = months[idx];
+            let hintList = hints[monthName];
+            if (hintList && !card.querySelector('.custom-hint-box')) {
+                const hintBox = document.createElement('div');
+                hintBox.className = 'custom-hint-box';
+                hintBox.style.fontSize = '0.7rem';
+                hintBox.style.backgroundColor = '#f7f0e0';
+                hintBox.style.borderRadius = '28px';
+                hintBox.style.padding = '6px 10px';
+                hintBox.style.marginTop = '12px';
+                hintBox.style.border = '1px solid #e2cf9e';
+                hintBox.style.color = '#5b4a2c';
+                hintBox.innerHTML = `<strong>📖 план:</strong><br> ${hintList.join(' • ')}`;
+                card.appendChild(hintBox);
+            }
+        });
+    }
+    
+    // ---------- 2. Чек-лист произведений (полный список по вашему заданию) ----------
+    const booksData = {
+        required: [
+            "Гомер. «Илиада», «Одиссея» (фрагменты)",
+            "Былина «Илья Муромец и Соловей-разбойник»",
+            "Былина «Садко»",
+            "«Повесть временных лет»: «Сказание о белгородском киселе»",
+            "«Предание о смерти князя Олега»",
+            "А. С. Пушкин. Роман «Дубровский»",
+            "А. С. Пушкин. Стихи: «Узник», «Зимняя дорога», «Песнь о вещем Олеге»",
+            "М. Ю. Лермонтов. «Три пальмы», «Листок», «Утёс»",
+            "И. С. Тургенев. «Бежин луг»",
+            "Н. С. Лесков. «Левша»",
+            "Л. Н. Толстой. «Детство» (главы по выбору)",
+            "А. П. Чехов. «Толстый и тонкий»",
+            "А. П. Чехов. «Хамелеон»",
+            "А. П. Чехов. «Смерть чиновника»",
+            "А. И. Куприн. «Чудесный доктор»",
+            "В. Г. Распутин. «Уроки французского»",
+            "Д. Дефо. «Робинзон Крузо»",
+            "Дж. Свифт. «Путешествия Гулливера»",
+            "Ж. Верн. «Дети капитана Гранта» (главы по выбору)"
+        ],
+        extracurricular: [
+            "В. Крапивин. «Тень каравеллы»",
+            "Кир Булычёв. «Гай-до»",
+            "Диана Уинн Джонс. «Ходячий замок»",
+            "В. Железников. «Чучело»",
+            "А. Жвалевский, Е. Пастернак. «Время всегда хорошее»",
+            "Н. Абгарян. «Манюня»",
+            "Андерс Якобссон. «Дневник Берта»",
+            "Корнелия Функе. «Чернильное сердце»",
+            "Евгений Гаглоев. «Зерцалия: Иллюзион»"
+        ]
+    };
+    
+    let checklistState = {}; // key -> boolean
+    function loadChecklistState() {
+        const saved = localStorage.getItem('summerChecklistV2');
+        if (saved) {
+            checklistState = JSON.parse(saved);
+        } else {
+            checklistState = {};
+            const allItems = [...booksData.required, ...booksData.extracurricular];
+            allItems.forEach(title => { checklistState[title] = false; });
+        }
+    }
+    
+    function saveChecklistState() {
+        localStorage.setItem('summerChecklistV2', JSON.stringify(checklistState));
+        updateChecklistStats();
+        renderChecklist(); // обновляем визуал и статистику
+    }
+    
+    function updateChecklistStats() {
+        const total = Object.keys(checklistState).length;
+        const completed = Object.values(checklistState).filter(v => v === true).length;
+        const statsDiv = document.getElementById('checklistStats');
+        if (statsDiv) statsDiv.innerHTML = `✅ Прочитано книг: ${completed} из ${total}  (${Math.round(completed/total*100)}%)`;
+        return { completed, total };
+    }
+    
+    function renderChecklist() {
+        const container = document.getElementById('checklistDynamic');
+        if (!container) return;
+        let html = `<div class="checklist-section"><h3>📚 Обязательное чтение</h3>`;
+        booksData.required.forEach(title => {
+            const checked = checklistState[title] === true;
+            html += `
+                <div class="checklist-item ${checked ? 'checked' : ''}" data-title="${escapeHtml(title)}">
+                    <div class="checkbox-custom">${checked ? '✓' : ''}</div>
+                    <div class="item-text">${escapeHtml(title)}</div>
+                </div>
+            `;
+        });
+        html += `</div><div class="checklist-section"><h3>🚀 Внеклассное чтение</h3>`;
+        booksData.extracurricular.forEach(title => {
+            const checked = checklistState[title] === true;
+            html += `
+                <div class="checklist-item ${checked ? 'checked' : ''}" data-title="${escapeHtml(title)}">
+                    <div class="checkbox-custom">${checked ? '✓' : ''}</div>
+                    <div class="item-text">${escapeHtml(title)}</div>
+                </div>
+            `;
+        });
+        html += `</div>`;
+        container.innerHTML = html;
+        
+        // add event listeners
+        document.querySelectorAll('.checklist-item').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const title = el.getAttribute('data-title');
+                if (title && checklistState[title] !== undefined) {
+                    checklistState[title] = !checklistState[title];
+                    saveChecklistState();
+                }
+            });
+        });
+        updateChecklistStats();
+    }
+    
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+    
+    // итоговые поля + сброс
+    function saveMetaFields() {
         const hard = document.getElementById('hardBook')?.value || '';
         const fav = document.getElementById('favoriteBook')?.value || '';
         const grade = document.getElementById('selfGrade')?.value || '';
         localStorage.setItem('summerBookMeta', JSON.stringify({ hard, fav, grade }));
     }
     
-    function restoreInputsFromLocal() {
+    function restoreMetaFields() {
         const meta = localStorage.getItem('summerBookMeta');
         if (meta) {
             try {
@@ -494,90 +656,46 @@
         }
     }
     
-    // сброс всех листьев
-    function resetAllLeaves() {
-        if (confirm('🌿 Сбросить все отметки чтения? Все листья станут пустыми. Итоговые записи книг останутся.')) {
+    function resetAllData() {
+        if (confirm('Сбросить все отметки: дерево чтения и чек-лист книг? Поля с любимыми книгами останутся.')) {
+            // сброс дерева
             for (let m of months) {
                 for (let w = 0; w < 4; w++) {
                     trackerData[m][`week${w}`] = [0,0,0,0,0,0,0];
                 }
             }
-            saveData();
-            rerenderAll();
+            saveTreeData();
+            rerenderTree();
+            // сброс чек-листа
+            const allItems = [...booksData.required, ...booksData.extracurricular];
+            allItems.forEach(title => { checklistState[title] = false; });
+            saveChecklistState();
+            renderChecklist();
         }
     }
     
-    // добавляем событие сохранения полей при вводе
-    function bindInputsSave() {
+    // инициализация
+    function init() {
+        loadChecklistState();
+        rerenderTree();
+        renderChecklist();
+        restoreMetaFields();
+        updateTotalCountDisplay();
+        
+        const resetBtn = document.getElementById('resetAllBtn');
+        if (resetBtn) resetBtn.addEventListener('click', resetAllData);
+        
         const hardInput = document.getElementById('hardBook');
         const favInput = document.getElementById('favoriteBook');
         const gradeInput = document.getElementById('selfGrade');
-        if (hardInput) hardInput.addEventListener('input', () => saveInputsToLocal());
-        if (favInput) favInput.addEventListener('input', () => saveInputsToLocal());
-        if (gradeInput) gradeInput.addEventListener('input', () => saveInputsToLocal());
-    }
-    
-    // дополнительный метод для печати подсказок, в том числе чтобы при печати были видны отметки
-    // а также добавим описание книжек-рекомендаций на полях в виде маленького напоминания? Визуально сделаем дополнительный блок с основными произведениями по неделям.
-    // Чтобы трекер был полезен, добавим внизу каждого месяца мини-памятку (что читать ориентировочно)
-    function addReadingHints() {
-        const hints = {
-            "Июнь": ["1 нед: Левша🔴, Чехов, Манюня", "2 нед: Уроки французского🔴, Дубровский, Время всегда хорошее", "3 нед: Гомер(циклоп), Бежин луг, Лермонтов, Ходячий замок", "4 нед: Детство, Былины, Чехов, стихи Пушкина"],
-            "Июль": ["5 нед: Робинзон Крузо, Чучело🔴, Дневник Берта", "6 нед: Гулливер, Дети капитана Гранта, Гай-до", "7 нед: Тень каравеллы, Манюня, Дневник Берта", "8 нед: Чернильное сердце, Зерцалия, стихи"],
-            "Август": ["9 нед: доделать Левшу/Уроки франц., Бежин луг", "10 нед: Ходячий замок, Манюня, Чехов", "11 нед: повтор Пушкин, Лермонтов, Гомер", "12 нед: свободное чтение / отдых"]
-        };
-        const monthCards = document.querySelectorAll('.month-card');
-        if (monthCards.length === 3) {
-            monthCards.forEach((card, idx) => {
-                let monthName = months[idx];
-                let hintList = hints[monthName];
-                if (hintList) {
-                    const hintBox = document.createElement('div');
-                    hintBox.style.fontSize = '0.7rem';
-                    hintBox.style.backgroundColor = '#f7f0e0';
-                    hintBox.style.borderRadius = '28px';
-                    hintBox.style.padding = '8px 10px';
-                    hintBox.style.marginTop = '14px';
-                    hintBox.style.border = '1px solid #e2cf9e';
-                    hintBox.style.color = '#5b4a2c';
-                    hintBox.innerHTML = `<strong>📖 подсказка:</strong><br> ${hintList.join(' • ')}`;
-                    card.appendChild(hintBox);
-                }
-            });
-        }
-    }
-    
-    // функция для отслеживания мутаций после отрисовки (чтобы добавить хинты)
-    function observeAndAddHints() {
-        const observer = new MutationObserver(() => {
-            if (document.querySelectorAll('.month-card').length === 3 && !document.querySelector('.hint-added')) {
-                addReadingHints();
-                const hintsDiv = document.querySelectorAll('.month-card .hint-added'); // метка не нужна
-                document.querySelectorAll('.month-card').forEach(c => c.classList.add('hint-added'));
-                observer.disconnect();
-            }
-        });
-        observer.observe(document.getElementById('monthsGrid'), { childList: true, subtree: false });
-        setTimeout(() => {
-            if (document.querySelectorAll('.month-card').length === 3) addReadingHints();
-        }, 50);
-    }
-    
-    // первичная инициализация
-    function init() {
-        rerenderAll();
-        bindInputsSave();
-        const resetBtn = document.getElementById('resetAllBtn');
-        if (resetBtn) resetBtn.addEventListener('click', resetAllLeaves);
-        restoreInputsFromLocal();
-        // добавим хинты после небольшой задержки
-        setTimeout(() => {
-            addReadingHints();
-        }, 100);
-        observeAndAddHints();
-        // добавим дополнительный слушатель сохранения полей при уходе со страницы
+        if (hardInput) hardInput.addEventListener('input', saveMetaFields);
+        if (favInput) favInput.addEventListener('input', saveMetaFields);
+        if (gradeInput) gradeInput.addEventListener('input', saveMetaFields);
+        
         window.addEventListener('beforeunload', () => {
-            saveInputsToLocal();
+            saveMetaFields();
+            saveTreeData();
+            saveChecklistState();
         });
     }
     
@@ -585,3 +703,4 @@
 </script>
 </body>
 </html>
+```
